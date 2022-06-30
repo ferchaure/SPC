@@ -26,7 +26,7 @@ static int init=0;
 **/
 
 int hfunc( char* n ) {
-   int i, b, h;
+   int h;
    h = 4 * (n[0] % 32) + n[1] % 4;
    assure( h<PLIST_SIZE, "h too large" );
    return h;

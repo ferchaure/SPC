@@ -107,7 +107,7 @@ void PrintAverages(int nT, float T, double e, double ee, float nc, float *Size)
   fclose(out);
 
      
-  printf("ave: ",ext);
+  printf("ave: ");
   printf("%8.5f    ", T);
   printf("%8.5f    ", e);
   printf("%8.5f    ", ee);
@@ -172,24 +172,6 @@ void PrintFPointCorr( int nT, float T, RARaggedArray FPCorr,
   int  i,k,i1,k1;
   FILE *out;
   char file[PARAM_MAX_FIELD+10];
-  static short first_time = 1;
-
-  /*
-  if( first_time ) {
-    strcpy(file,GetParam("OutFile"));
-    strcat(file,".4pOrder");
-    out = fopen(file,"w");
-    for(i = 0; i < FPCorr.n; i++) 
-      for(k = 0; k<FPCorr.c[i]; k++) 
-	if(NK.p[i][k]>i) 
-	  for(i1 = i+1; i1 < NK.n; i1++)
-	    for(k1 = 0; k1<FPCorr.c[i1]; k1++) 
-	      if (NK.p[i1][k1]>i1)
-		fprintf(out,"%d %d %d %d\n", i,NK.p[i][k],i1,NK.p[i1][k1]);
-    fclose(out);
-    first_time = 0;
-  }
-  */
 
   strcpy(file,GetParam("OutFile"));
   strcat(file,".4pc");
@@ -219,8 +201,8 @@ float chkinteg(float q) {
 
 void PrintFPSum(int nT, RaggedArray J, UIRaggedArray Corr, RARaggedArray FPCorr,
 		UIRaggedArray NK, int ncy) {
-  int  i,j,k;
-  int  i1,j1,k1;
+  int  i,k;
+  int  i1,k1;
   float s = 0, dum;
   FILE *out;
   char file[80];

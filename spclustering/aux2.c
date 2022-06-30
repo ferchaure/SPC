@@ -88,8 +88,8 @@ void  GlobalCorrelation( UIRaggedArray CorrN, UIRaggedArray NK,
 **/
 void  FourPointCorrelation( RARaggedArray FPCorr, UIRaggedArray NK,
 			    unsigned int *Block) {
-  int i,j,k;
-  int i1,j1,k1;
+  int i,k;
+  int i1,k1;
   
   for(i = 0; i < NK.n; i++) 
     for(k = 0; k<NK.c[i]; k++) 

@@ -231,8 +231,8 @@ void  OrderingClusters(
   unsigned int  *Size,
   unsigned int  *Indx )
 {
-   int i, j, done;
-   unsigned int t, *NewIndx;
+   int i;
+   unsigned int *NewIndx;
    
    if( nblock == 1 )
       return;

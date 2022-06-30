@@ -116,7 +116,7 @@ int uicomp(const void *i, const void *j)
    edge.c
 **/    
 void OrderEdges( UIRaggedArray *nk ) {
-   int i, j;
+   int i;
    for( i=0; i<nk->n; i++ )
       qsort(nk->p[i],nk->c[i],sizeof(unsigned int),uicomp);   
 }
@@ -139,8 +139,7 @@ void OrderEdges( UIRaggedArray *nk ) {
 **/    
 UIRaggedArray InvertEdges(UIRaggedArray NK){
    UIRaggedArray M;
-   int i,j,k,k0;
-   int npts;
+   int i,k,k0;
 
    M = InitUIRaggedArray( NK );
 
