@@ -174,102 +174,119 @@ UIRaggedArray InvertEdges(UIRaggedArray NK){
    edge.c
 **/
 
+typedef struct{
+   double p;
+   int i;
+} dindex;
+
+int dindcmp(const void *i, const void *j) {
+   if((((dindex*)i)->p) > (((dindex*)j)->p)) return 1;
+   if((((dindex*)i)->p) < (((dindex*)j)->p)) return -1;
+   return 0;
+}
+
 UIRaggedArray knn( int N, int D, double** X ) {
      
-     double  *dist;		/* distances      */
-     int    **MNV;	/* Nearest neighbours array */
-     unsigned int    *indx;	/* auxiliar */
-     UIRaggedArray   nk;        /* returned array */
-     unsigned int **edg;        /* edges of mst */
-     unsigned int *occ;
-     
-     unsigned int i,j,k,metric,K,similiarity,cand,gomstree;
+  int    **MNV;	/* Nearest neighbours array */
+  UIRaggedArray   nk;        /* returned array */
+  unsigned int **edg;        /* edges of mst */
+  unsigned int *occ;
+  
+  unsigned int i,j,k,metric,K,similiarity,cand,gomstree;
+  dindex *dindices;
+  
+  K = IGetParam( "KNearestNeighbours" );
+  MNV = InitIMatrix(N,K);
+  metric = ( GetParam( "InfMetric" ) == NULL );
+  similiarity=(GetParam("DataIsInteraction")!=NULL);
+  dindices = (dindex *)malloc(N*sizeof(dindex));
+  if(K>N)
+    error("K > N ");
+    
+  /* Ordering of the neighbours - O(N^2 logN)
+  loop %90 of time*/
+  for(i = 0; i < N; i++) {
+    if(D != 0) {
+      if (metric)
+        for(j = 0; j < N; j++){
+          dindices[j].p = Squared_Distance(D,X[i],X[j]) ;
+          dindices[j].i = j;
+        }
 
-     K = IGetParam( "KNearestNeighbours" );
-     dist = calloc(N,sizeof(double));
-     MNV = InitIMatrix(N,K);
-     indx = InitUIVector(N);
-     metric = ( GetParam( "InfMetric" ) == NULL );
-     similiarity=(GetParam("DataIsInteraction")!=NULL);
+      else
+        for(j = 0; j < N; j++){
+          dindices[j].p = Distance_Linf(D,X[i],X[j]) ;
+          dindices[j].i = j;
+        }
+    } else {
+      for(j = 0; j < N; j++){
+        dindices[j].p = X[i][j];
+        dindices[j].i = j;
+      }
+    }
+    dindices[i].p = similiarity ? 0.0 : INF;
+    
+    qsort(dindices,N,sizeof(dindex),dindcmp);
+    
+    if (similiarity) 
+      for(j = 0; j < K; j++) 
+        MNV[i][j] = dindices[N-j].i;
+    else
+      for(j = 0; j < K; j++) 
+        MNV[i][j] = dindices[j].i;
+  }
 
-     if(K>N)
-       error("K > N ");
-     
-     
-     /* Ordering of the neighbours - O(N^2 logN)*/
-     for(i = 0; i < N; i++) {
-       if(D != 0) {
-	 for(j = 0; j < N; j++)
-	   dist[j] = metric ?
-	     Squared_Distance(D,X[i],X[j]) 
-	     : Distance_Linf(D,X[i],X[j]);
-       } else {
-	 for(j = 0; j < N; j++)
-	   dist[j] = X[i][j];
-       }
-       dist[i] = similiarity ? 0 : INF;
+  free(dindices);
+  gomstree = (GetParam("MSTree")!=NULL);
+  if( gomstree ) {
+    edg = InitUIMatrix(N-1,2);
+    mstree(N,D,X,edg);
+  }
 
-       DSortIndex(N,dist,indx);
-       if (similiarity) 
-	 for(j = 0; j < K; j++) 
-	   MNV[i][j] = indx[N-j];
-       else
-	 for(j = 0; j < K; j++) 
-	   MNV[i][j] = indx[j];
-     }
-     free(indx); free(dist);
-
-
-     gomstree = (GetParam("MSTree")!=NULL);
-     if( gomstree ) {
-       edg = InitUIMatrix(N-1,2);
-       mstree(N,D,X,edg);
-     }
-
-     /* Check for mutality - O(NK^2) */
-     for (i=0;i<N;i++) {
-       for(j=0;j<K;j++) {
-	 if (MNV[i][j]<0)
-	   continue;
-	 cand = MNV[i][j];	/* candidate becomes ngbr if its mutual */
-	 for(k=0;k<K && MNV[cand][k] != i;k++);
-	 MNV[i][j]-=(MNV[i][j]+1)*(K==k); /* If the candidate is rejected */
-	                                  /* its name is replaced by (-1). */
-       }
-     }
+    /* Check for mutality - O(NK^2) */
+  for (i=0;i<N;i++) {
+    for(j=0;j<K;j++) {
+      if (MNV[i][j]<0)
+        continue;
+      cand = MNV[i][j];	/* candidate becomes ngbr if its mutual */
+      for(k=0;k<K && MNV[cand][k] != i;k++);
+      MNV[i][j]-=(MNV[i][j]+1)*(K==k); /* If the candidate is rejected */
+                                  /* its name is replaced by (-1). */
+    }
+  }
 
 
-     /* Construction of the nk matrix O(NK)*/
-     nk.n = N;
-     nk.c = (unsigned int*)calloc(N,sizeof(unsigned int));
-     nk.p = (unsigned int**)calloc(N,sizeof(unsigned int*));
-     occ = (unsigned int*)calloc(N,sizeof(unsigned int));
-     for(i = 0; i < N; i++) {     
-       for (j=0;j<N;j++)
-	 occ[j]=0; 
-       for(j = 0; j < K; j++)
-	 occ[MNV[i][j]]+=(MNV[i][j]>=0);
- 
-       if (gomstree) {
-	 for(j=0;j<(N-1);j++)
-	   if (edg[j][0]==i)
-	     occ[edg[j][1]]++;
-	   else if (edg[j][1]==i)
-	     occ[edg[j][0]]++;
-       }
-	     
-       for (j=0;j<N;j++)
-	 nk.c[i]+=(occ[j]>0);
-       nk.p[i] = (unsigned int*)calloc(nk.c[i],sizeof(unsigned int));
-       for (k=0,j=0;j<N;j++)
-	 if (occ[j]) nk.p[i][k++]=j;
-     }
-     if (gomstree)
-       FreeUIMatrix(edg,N-1);
-     FreeIMatrix(MNV,N);
-     free(occ);
-     
-     return nk;
+  /* Construction of the nk matrix O(NK)*/
+  nk.n = N;
+  nk.c = (unsigned int*)calloc(N,sizeof(unsigned int));
+  nk.p = (unsigned int**)calloc(N,sizeof(unsigned int*));
+  occ = (unsigned int*)malloc(N*sizeof(unsigned int));
+  for(i = 0; i < N; i++) {
+    for (j=0;j<N;j++)
+      occ[j]=0; 
+    for(j = 0; j < K; j++)
+      occ[MNV[i][j]]+=(MNV[i][j]>=0);
+
+    if (gomstree) {
+      for(j=0;j<(N-1);j++)
+        if (edg[j][0]==i)
+          occ[edg[j][1]]++;
+        else if (edg[j][1]==i)
+          occ[edg[j][0]]++;
+    }
+    
+    for (j=0;j<N;j++)
+      nk.c[i]+=(occ[j]>0);
+    nk.p[i] = (unsigned int*)calloc(nk.c[i],sizeof(unsigned int));
+    for (k=0,j=0;j<N;j++)
+      if (occ[j]) nk.p[i][k++]=j;
+  }
+  if (gomstree)
+    FreeUIMatrix(edg,N-1);
+  FreeIMatrix(MNV,N);
+  free(occ);
+  
+  return nk;
 }
 
 

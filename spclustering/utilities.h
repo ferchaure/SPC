@@ -31,7 +31,4 @@ void FreeMatrix( float** m, long n );
 void ResetCMatrix( char** m, long n, long j );
 void ResetDMatrix( double** m, long n, long j );
 
-
-void DSortIndex( int n, double* a, unsigned int* j );
-
 #endif

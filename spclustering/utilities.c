@@ -145,59 +145,6 @@ void FreeMatrix( float** m, long n ) {
 }
    
 
-/************************************************************/
-/*           double index qsort                             */
-
-typedef struct{
-   double* p;
-   int i;
-} dindex;
-
-// int dindcmp(const void *i, const void *j) {
-//    static double h;
-//    h = *(((dindex*)i)->p) - *(((dindex*)j)->p);
-//    if( h>((double)0.0) ) return 1;
-//    if( h<((double)0.0) ) return -1;
-//    return 0;
-// }
-int dindcmp(const void *i, const void *j) {
-   if(*(((dindex*)i)->p) > *(((dindex*)j)->p)) return 1;
-   if(*(((dindex*)i)->p) < *(((dindex*)j)->p)) return -1;
-   return 0;
-}
-/**
-   \section{DSortIndex}
-   \subsection{Description}
-   Sort an the indices vector $j$ of a double array $a$ \\
-   so that $m<n \longrightarrow a[j[m]]<a[j[n]]$. 
-   \subsection{Input parameters}
-   \begin{itemize}
-   \item[n] Number of elements in the array.
-   \item[a] The double array.
-   \end{itemize}
-   \subsection{Output parameters}
-   \begin{itemize}
-   \item[j] The ordered indices array.
-   \end{itemize}
-   \subsection{Auxiliary function}
-   dindcmp()
-   \subsection{file}
-   utilities.c
-**/
-void DSortIndex( int n, double* a, unsigned int* j ) {
-   dindex *indx;
-   int k;
-   indx = (dindex *)malloc( n*sizeof(dindex) );
-   for( k=0; k<n; k++){
-      indx[k].p = a+k;
-      indx[k].i = k;
-  }
-  qsort(indx,n,sizeof(dindex),dindcmp);
-  for( k=0; k<n; k++)
-     j[k] = indx[k].i;
-  free(indx);
-}
-
 /*                                                        */
 /**********************************************************/
 
