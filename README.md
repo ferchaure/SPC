@@ -1,6 +1,6 @@
 # spclustering: Super Paramagnetic Clustering Wrapper
 
-This is a Python wrapper for the original SPC algorithm (using  Ctypes). The SPC code was edited to work as a shared library, reduce disk usage and improve the interface with Python.
+This is a Python Ctypes wrapper for the original SPC algorithm (available in [Eytan Domany repository](https://github.com/eytandomany/SPC)). The SPC code was edited to work as a shared library, reduce disk usage and improve speed and interface with Python.
 
 ## How to install spclustering
 
