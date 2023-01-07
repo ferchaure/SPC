@@ -20,6 +20,142 @@
    edge.c
 **/
 
+typedef struct{
+   double p;
+   int i;
+} dindex;
+
+static void swap(dindex* a, dindex* b){
+    dindex aux=*b;
+    *b=*a;
+    *a=aux;
+}
+
+static void downheap_max(dindex* elements,size_t n,size_t pos){
+    if(pos>=n)
+        return;
+    size_t left = 2*pos+1;
+    size_t right = 2*pos+2;
+    
+    if(left>=n) 
+        return;
+    if(right>=n){
+        if((elements[pos].p - elements[left].p)<0){ 
+            swap(&elements[pos],&elements[left]);
+            pos=left;
+            downheap_max(elements,n, pos);
+            return;
+        }
+        else
+            return;
+    }
+    if(((elements[pos].p - elements[left].p)>=0) && ((elements[pos].p - elements[right].p)>=0))
+        return;
+    if((elements[left].p - elements[right].p)>0){
+        swap(&elements[pos],&elements[left]);
+        pos=left;
+    }else{
+        swap(&elements[pos],&elements[right]);
+        pos=right;
+    }
+   
+    downheap_max(elements,n, pos);
+}
+
+void k_smallest_distance_index(dindex* arr, size_t k, size_t n, int **MNV, size_t mnv_i){
+       
+    dindex* elements=malloc(sizeof(dindex)*k);
+    if(elements==NULL)
+        return;
+
+    for(size_t i=0;i<k;i++)
+        elements[i]=arr[i];
+
+    //sort elements as heap   
+    for(size_t i=k; i>0;i--)
+        downheap_max(elements,k,i-1);
+    
+    // lookover elements with less distance in the original arr. If any you add it in the elements array. 
+    for(size_t i=k;i<n;i++){
+        if(arr[i].p < elements[0].p){
+            elements[0] = arr[i];
+            downheap_max(elements, k, 0);
+        }
+    }
+
+    for(size_t i=0; i<k;i++){
+        swap(&elements[0],&elements[k-1-i]);
+        downheap_max(elements,k-1-i,0);
+    }
+    for(size_t i=0; i<k; i++){
+        MNV[mnv_i][i] = elements[i].i;
+    }
+    free(elements);
+}
+
+static void downheap_min(dindex* elements,size_t n,size_t pos){
+    if(pos>=n)
+        return;
+    size_t left = 2*pos+1;
+    size_t right = 2*pos+2;
+    
+    if(left>=n) 
+        return;
+    if(right>=n){
+        if((elements[pos].p - elements[left].p)>0){ 
+            swap(&elements[pos],&elements[left]);
+            pos=left;
+            downheap_min(elements,n, pos);
+            return;
+        }
+        else
+            return;
+    }
+    if(((elements[pos].p - elements[left].p)<=0) && ((elements[pos].p - elements[right].p)<=0))
+        return;
+    if((elements[left].p - elements[right].p)<0){
+        swap(&elements[pos],&elements[left]);
+        pos=left;
+    }else{
+        swap(&elements[pos],&elements[right]);
+        pos=right;
+    }
+   
+    downheap_min(elements,n, pos);
+}
+
+void k_greatest_distance_index(dindex* arr, size_t k, size_t n, int **MNV, size_t mnv_i){
+       
+    dindex* elements=malloc(sizeof(dindex)*k);
+    if(elements==NULL)
+        return;
+          
+    for(size_t i=0;i<k;i++)
+        elements[i]=arr[i];
+
+    //sort elements as heap   
+    for(size_t i=k; i>0;i--)
+        downheap_min(elements,k,i-1);
+    
+    // lookover elements with less distance in the original arr. If any you add it in the elements array. 
+    for(size_t i=k;i<n;i++){
+        if(arr[i].p > elements[0].p){
+            elements[0]=arr[i];
+            downheap_min(elements, k, 0);
+        }
+    }
+
+    for(size_t i=0; i<k;i++){
+        swap(&elements[0],&elements[k-1-i]);
+        downheap_min(elements,k-1-i,0);
+    }
+    for(size_t i=0; i<k; i++){
+        MNV[mnv_i][i] = elements[i].i;
+    }
+    free(elements);
+}
+
+
 void ReadEdgeFile( int N, UIRaggedArray *nk ) {
    int i, j, v0, v1, fusion;
    unsigned int *pp, *cf;
@@ -174,11 +310,6 @@ UIRaggedArray InvertEdges(UIRaggedArray NK){
    edge.c
 **/
 
-typedef struct{
-   double p;
-   int i;
-} dindex;
-
 int dindcmp(const void *i, const void *j) {
    if((((dindex*)i)->p) > (((dindex*)j)->p)) return 1;
    if((((dindex*)i)->p) < (((dindex*)j)->p)) return -1;
@@ -225,15 +356,12 @@ UIRaggedArray knn( int N, int D, double** X ) {
       }
     }
     dindices[i].p = similiarity ? 0.0 : INF;
+
+    if (similiarity){ 
+      k_greatest_distance_index(dindices, K, N, MNV, i);
+    } else 
+      k_smallest_distance_index(dindices, K, N, MNV, i);
     
-    qsort(dindices,N,sizeof(dindex),dindcmp);
-    
-    if (similiarity) 
-      for(j = 0; j < K; j++) 
-        MNV[i][j] = dindices[N-j].i;
-    else
-      for(j = 0; j < K; j++) 
-        MNV[i][j] = dindices[j].i;
   }
 
   free(dindices);
