@@ -18,6 +18,7 @@ The original code requires gcc and makefile. For Windows I recommend [TDM-GCC](h
 ```python
 from spclustering import SPC
 import matplotlib.pyplot as plt
+import numpy as np
 
 rng = np.random.RandomState(0)
 
@@ -34,6 +35,8 @@ temp = 1
 plt.plot(*data[results[temp,:]==0,:].T,'.r')
 plt.plot(*data[results[temp,:]==1,:].T,'.b')
 plt.plot(*data[results[temp,:]>1,:].T,'.k')
+
+plot.show()
 
 ```
 
