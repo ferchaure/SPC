@@ -5,7 +5,7 @@ from setuptools  import find_packages
 import sys
 from os import chdir
 
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 from distutils.util import get_platform
 
 try:
