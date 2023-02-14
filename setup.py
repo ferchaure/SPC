@@ -5,7 +5,7 @@ from setuptools  import find_packages
 import sys
 from os import chdir
 
-VERSION = '0.0.3'
+VERSION = '0.1.0'
 from distutils.util import get_platform
 
 try:
@@ -43,7 +43,7 @@ setup(name='spclustering',
       'build': MyBuild,'bdist_wheel': bdist_wheel
       },
       package_data={"": ["*.c","*.h","Makefile",'spclib.so']},
-      install_requires=['numpy'],
+      install_requires=['numpy','matplotlib'],
       keywords=['clustering'],
           classifiers=[
         "Programming Language :: Python :: 3",
