@@ -30,14 +30,18 @@ gt = [cl1,cl2,cl3,cl4]
 
 #plot clusters
 plt.figure()
+
 for cl in gt:
     plt.plot(*cl.T,marker='.',linestyle='',markersize=3)
 plt.title('Ground Truth')
 plt.grid()
 plt.show()
+```
+![output_gt](https://user-images.githubusercontent.com/5598671/232350354-fb3d24ea-1e18-45f7-90e7-1ccddd4e2d82.png)
 
-
-#run the algorithm. The fit method applied the cluster selection described in Waveclus 3. The method fit_WC1 is the alternative using the original Waveclus 1 temperature selection.
+```
+#run the algorithm. The fit method applied the cluster selection described in Waveclus 3. 
+#The method fit_WC1 is the alternative using the original Waveclus 1 temperature selection.
 data = np.concatenate(gt)
 clustering = SPC(mintemp=0,maxtemp=0.2)
 labels, metadata = clustering.fit(data,min_clus=150,return_metadata=True)
@@ -45,7 +49,11 @@ labels, metadata = clustering.fit(data,min_clus=150,return_metadata=True)
 #It is posible to show a temperature map using the optional output metadata
 plot_temperature_plot(metadata)
 plt.show()
+```
 
+![temp_map](https://user-images.githubusercontent.com/5598671/232350373-855254b9-fa42-4ba3-aa8c-b110aeefa53e.png)
+
+```
 #To show the assigned labels:
 plt.figure()
 for c in np.unique(labels):
@@ -57,6 +65,8 @@ plt.grid()
 plt.title('Results')
 plt.show()
 ```
+
+![output_results](https://user-images.githubusercontent.com/5598671/232350380-19bc5d10-7e52-443c-83d3-5a9f7ba6090e.png)
 
 ## Limitations and Changes
 
