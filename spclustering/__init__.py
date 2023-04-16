@@ -1,1 +1,1 @@
-from .spc import SPC
+from .spc import SPC,plot_temperature_plot

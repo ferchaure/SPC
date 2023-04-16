@@ -1,6 +1,6 @@
 # spclustering: Super Paramagnetic Clustering Wrapper
 
-This is a Python Ctypes wrapper for the original SPC algorithm (available in [Eytan Domany repository](https://github.com/eytandomany/SPC)). The SPC code was edited to work as a shared library, reduce disk usage and improve speed and interface with Python.
+This is a Python Ctypes wrapper for the original SPC algorithm (available in [Eytan Domany repository](https://github.com/eytandomany/SPC)). The SPC code was edited to work as a shared library, reduce disk usage and improve speed and interface with Python. Two methods are included to select clusters, see [Cluster Selection](#cluster-selection) below. The method WC1 select clusters at one particular temperature and WC3 (default for .fit() method) selects multiple temperatures prioritizing high temperatures (this method is better to detect more clusters but a bigger number of elements will remain unlabeled).
 
 ## How to install spclustering
 
@@ -19,8 +19,8 @@ The original code requires gcc and makefile. For Windows I recommend [TDM-GCC](h
 from spclustering import SPC, plot_temperature_plot
 import matplotlib.pyplot as plt
 import numpy as np
-randomseed = 0
-rng = np.random.RandomState(randomseed)
+
+rng = np.random.RandomState(0)
 
 cl1 = rng.multivariate_normal([8, 8], [[4,0],[0,3]], size=800)
 cl2 = rng.multivariate_normal([0,0], [[3,0],[0,2]], size=2000)
@@ -39,7 +39,7 @@ plt.show()
 
 #run the algorithm. The fit method applied the cluster selection described in Waveclus 3. The method fit_WC1 is the alternative using the original Waveclus 1 temperature selection.
 data = np.concatenate(gt)
-clustering = SPC(mintemp=0,maxtemp=0.2,randomseed=randomseed)
+clustering = SPC(mintemp=0,maxtemp=0.2)
 labels, metadata = clustering.fit(data,min_clus=150,return_metadata=True)
 
 #It is posible to show a temperature map using the optional output metadata
