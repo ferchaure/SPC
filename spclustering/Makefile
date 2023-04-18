@@ -3,7 +3,7 @@
 CC = gcc
 
 CFLAGS =  -O3 -fPIC
-EFILE =  ./SW
+EFILE =  SW
 SHAREDLIB =  spclib
 
 OBJ  =  RaggedArray.o aux1.o aux2.o edge.o distance.o io.o param.o timer.o utilities.o
@@ -25,7 +25,7 @@ utilities.o: utilities.h
 test_lib: spclib.c RaggedArray.o aux1.o aux2.o edge.o distance.o io.o param.o timer.o utilities.o
 	gcc -Wall -pedantic -shared -fPIC -o spclib.so spc.c RaggedArray.o aux1.o aux2.o edge.o distance.o io.o param.o timer.o utilities.o
 
-makelib: rmlib spclib clean
+makelib: spclib #this lines are problematic in windows but useful to clean in linux
 
 rmexec:
 	rm -f $(EFILE)

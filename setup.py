@@ -24,7 +24,12 @@ class MyBuild(DistutilsBuild):
     def run(self):
       chdir('spclustering')
       print('running makefile:')
-      if subprocess.call(['make','makelib']) != 0:
+      try:
+        if subprocess.call(['make','makelib']) != 0:
+            sys.exit(-1)
+        subprocess.call(['make','clean'])
+      except FileNotFoundError:
+        if subprocess.call(['mingw32-make','makelib']) != 0: #in windows try to run mingw32-make instead
             sys.exit(-1)
       chdir('..')
 
