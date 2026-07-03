@@ -14,21 +14,20 @@
    \subsection{file}
    aux2.c
 **/
-float AverageInteraction( RaggedArray J )
-{
-int     i,k;
-int     sum = 0;
-float   J1 = 0;
-   
-   for(i = 0;  i < J.n; i++)
-     for(k = 0; k<J.c[i]; k++) {
-       J1 += J.p[i][k];
-       sum++;
-     }
-   
-   J1 /= ((float) sum);
-   
-   return(J1);
+float AverageInteraction(RaggedArray J) {
+  int i, k;
+  int sum = 0;
+  float J1 = 0;
+
+  for (i = 0; i < J.n; i++)
+    for (k = 0; k < J.c[i]; k++) {
+      J1 += J.p[i][k];
+      sum++;
+    }
+
+  J1 /= ((float)sum);
+
+  return (J1);
 }
 
 /**
@@ -52,16 +51,16 @@ float   J1 = 0;
    \subsection{file}
    aux2.c
 **/
-void  GlobalCorrelation( UIRaggedArray CorrN, UIRaggedArray NK,
-			 unsigned int *Block )
-{
-   int  i,k;
+void GlobalCorrelation(UIRaggedArray CorrN, UIRaggedArray NK,
+                       unsigned int *Block) {
+  int i, k;
 
-   for(i = 0; i < NK.n; i++)
-      for(k = 0; k<NK.c[i]; k++)
-	 if( Block[i] == Block[ NK.p[i][k] ] ) CorrN.p[i][k]++;
-           
-   return;
+  for (i = 0; i < NK.n; i++)
+    for (k = 0; k < NK.c[i]; k++)
+      if (Block[i] == Block[NK.p[i][k]])
+        CorrN.p[i][k]++;
+
+  return;
 }
 
 /**
@@ -86,28 +85,27 @@ void  GlobalCorrelation( UIRaggedArray CorrN, UIRaggedArray NK,
    \subsection{file}
    aux2.c
 **/
-void  FourPointCorrelation( RARaggedArray FPCorr, UIRaggedArray NK,
-			    unsigned int *Block) {
-  int i,k;
-  int i1,k1;
-  
-  for(i = 0; i < NK.n; i++) 
-    for(k = 0; k<NK.c[i]; k++) 
-      if(NK.p[i][k]>i) 
-        for(i1 = 0; i1 < NK.n; i1++)
-          for(k1 = 0;  k1<NK.c[i1]; k1++) 
-            if (NK.p[i1][k1]>i1) 
-              if(Block[i] == Block[NK.p[i][k]] 
-		 && Block[i1]==Block[NK.p[i1][k1]])
+void FourPointCorrelation(RARaggedArray FPCorr, UIRaggedArray NK,
+                          unsigned int *Block) {
+  int i, k;
+  int i1, k1;
+
+  for (i = 0; i < NK.n; i++)
+    for (k = 0; k < NK.c[i]; k++)
+      if (NK.p[i][k] > i)
+        for (i1 = 0; i1 < NK.n; i1++)
+          for (k1 = 0; k1 < NK.c[i1]; k1++)
+            if (NK.p[i1][k1] > i1)
+              if (Block[i] == Block[NK.p[i][k]] &&
+                  Block[i1] == Block[NK.p[i1][k1]])
                 (FPCorr.p[i][k]).p[i1][k1]++;
 }
 
-
-
 /* an auxiliary function for magnetization() and OrderClusterSize(). */
 /* returns the opposite result to this of uicomp in edge.c           */
-int uicompare(const void *i, const void *j)
-{ return (int)( *((unsigned int*)j) - *((unsigned int*)i) ); }
+int uicompare(const void *i, const void *j) {
+  return (int)(*((unsigned int *)j) - *((unsigned int *)i));
+}
 
 /**
    \section{Magnetization}
@@ -122,7 +120,7 @@ int uicompare(const void *i, const void *j)
    \item[Q] number of spin values (colors).
    \item[nc] number of clusters.
    \item[*ClusterSize] cluster sizes.
-   \item[$N_q$] previously allocated workspace of 
+   \item[$N_q$] previously allocated workspace of
        size $>=$ Q*sizeof(unsigned int).
    \end{itemize}
    \subsection{Output parameters}
@@ -134,19 +132,18 @@ int uicompare(const void *i, const void *j)
    \subsection{file}
    aux2.c
 **/
-float Magnetization( int N, int Q, int nc, unsigned int *ClusterSize,
-		     float* mag, unsigned int *N_q )
-{
-   int k, q;
+float Magnetization(int N, int Q, int nc, unsigned int *ClusterSize, float *mag,
+                    unsigned int *N_q) {
+  int k, q;
 
-   memset( N_q, 0, Q*sizeof(unsigned int) );
-   for(k = 0; k < nc; k++)
-      N_q[ IRAND(Q) ] += ClusterSize[k];
-   qsort(N_q,Q,sizeof(unsigned int),uicompare);
-   for(q = 0; q < Q; q++)
-      mag[q] = (float)( (int)(Q * N_q[q] - N) ) / (N*(Q - 1.0));
+  memset(N_q, 0, Q * sizeof(unsigned int));
+  for (k = 0; k < nc; k++)
+    N_q[IRAND(Q)] += ClusterSize[k];
+  qsort(N_q, Q, sizeof(unsigned int), uicompare);
+  for (q = 0; q < Q; q++)
+    mag[q] = (float)((int)(Q * N_q[q] - N)) / (N * (Q - 1.0));
 
-   return mag[0];
+  return mag[0];
 }
 
 /**
@@ -167,10 +164,9 @@ float Magnetization( int N, int Q, int nc, unsigned int *ClusterSize,
    \subsection{file}
    aux2.c
 **/
-void OrderClusterSize( int nc, unsigned int *ClusterSize )
-{
-   qsort(ClusterSize,nc,sizeof(unsigned int),uicompare);   
-}   
+void OrderClusterSize(int nc, unsigned int *ClusterSize) {
+  qsort(ClusterSize, nc, sizeof(unsigned int), uicompare);
+}
 
 /**
    \section{ClusterAverage}
@@ -192,15 +188,14 @@ void OrderClusterSize( int nc, unsigned int *ClusterSize )
    \subsection{file}
    aux2.c
 **/
-void ClusterAverage(int ncy, int N, float *Size1, float *Size2)
-{
-   int i;
-   /* assume Size1[] is in descending order */
-   for(i = 0; i<N && Size1[i]>0; i++) {
-      Size1[i] /= (float)ncy;
-      Size2[i] /= (float)ncy;
-      Size2[i] -= (Size1[i] * Size1[i]);
-   }
+void ClusterAverage(int ncy, int N, float *Size1, float *Size2) {
+  int i;
+  /* assume Size1[] is in descending order */
+  for (i = 0; i < N && Size1[i] > 0; i++) {
+    Size1[i] /= (float)ncy;
+    Size2[i] /= (float)ncy;
+    Size2[i] -= (Size1[i] * Size1[i]);
+  }
 }
 
 /**
@@ -222,45 +217,41 @@ void ClusterAverage(int ncy, int N, float *Size1, float *Size2)
    \subsection{file}
    aux2.c
 **/
-void Susceptibility( int Q, int ncy, float* M1, float* M2, float* xi )
-{
-   int q;
-   for(q=0;q<Q;q++) {
-      M1[q] /= (float)ncy;
-      M2[q] /= (float)ncy;          
-      xi[q] = (M2[q] -  M1[q] * M1[q]); 
-   }
+void Susceptibility(int Q, int ncy, float *M1, float *M2, float *xi) {
+  int q;
+  for (q = 0; q < Q; q++) {
+    M1[q] /= (float)ncy;
+    M2[q] /= (float)ncy;
+    xi[q] = (M2[q] - M1[q] * M1[q]);
+  }
 }
 
-int  Thresholding(int ncy, float threshold,   
-                  UIRaggedArray Corr, UIRaggedArray NK, CRaggedArray Bond,
-                  unsigned int *Block, unsigned int *ClusterSize,
-                  unsigned int *OldBlock, int *n_cols, unsigned int *ws)
-{
-   int i,k,nc;
-   float  th;
+int Thresholding(int ncy, float threshold, UIRaggedArray Corr, UIRaggedArray NK,
+                 CRaggedArray Bond, unsigned int *Block,
+                 unsigned int *ClusterSize, unsigned int *OldBlock, int *n_cols,
+                 unsigned int *ws) {
+  int i, k, nc;
+  float th;
 
-   th = threshold * ncy;
-     
-   for(i=0; i< NK.n; i++)
-       for(k = 0; k<NK.c[i];  k++)
-         if(th < Corr.p[i][k]) {
-           if ( OldBlock[i] == OldBlock[ NK.p[i][k] ] ) {
-             Bond.p[i][k] = 1;
-           }
-           else {
-             Bond.p[i][k] = 0;
-             (*n_cols)++;
-           }
-         }
-         else
-	   Bond.p[i][k] = 0;
-     
-   nc = Coarsening(Bond,Block,NK,ClusterSize,ws);
-   OrderingClusters(NK.n,nc,Block,ClusterSize,ws);
-   
-   return(nc);
-}  
+  th = threshold * ncy;
+
+  for (i = 0; i < NK.n; i++)
+    for (k = 0; k < NK.c[i]; k++)
+      if (th < Corr.p[i][k]) {
+        if (OldBlock[i] == OldBlock[NK.p[i][k]]) {
+          Bond.p[i][k] = 1;
+        } else {
+          Bond.p[i][k] = 0;
+          (*n_cols)++;
+        }
+      } else
+        Bond.p[i][k] = 0;
+
+  nc = Coarsening(Bond, Block, NK, ClusterSize, ws);
+  OrderingClusters(NK.n, nc, Block, ClusterSize, ws);
+
+  return (nc);
+}
 
 /* ---------------------------------------------------------------------- */
 /*   We perform a directed growth in order to  determin  a partition      */
@@ -274,54 +265,44 @@ int  Thresholding(int ncy, float threshold,
 /*   actually, here each point is joined to the cluster of                */
 /*   its predessessor   -- Guy */
 
-int  DirectedGrowth( int ncy, float threshold,   
-		     UIRaggedArray Corr, UIRaggedArray NK, UIRaggedArray KN,
-		     CRaggedArray Bond, unsigned int *Block, 
-		     unsigned int *ClusterSize, unsigned int *dgOldBlock,
-		     unsigned int *thOldBlock, unsigned int *ws )
-{
-   int i,k;
-   float th;
-   float dh;
-   int   nc;
-   int   max, kmax;
+int DirectedGrowth(int ncy, float threshold, UIRaggedArray Corr,
+                   UIRaggedArray NK, UIRaggedArray KN, CRaggedArray Bond,
+                   unsigned int *Block, unsigned int *ClusterSize,
+                   unsigned int *dgOldBlock, unsigned int *thOldBlock,
+                   unsigned int *ws) {
+  int i, k;
+  float th;
+  float dh;
+  int nc;
+  int max, kmax;
 
-   th = threshold * ncy;
-   dh = th/20;
+  th = threshold * ncy;
+  dh = th / 20;
 
-   for(i=0; i< NK.n; i++)
-      for(k = 0; k<NK.c[i];k++)
-         if ((th < Corr.p[i][k]) && 
-	     (thOldBlock[i] == thOldBlock[NK.p[i][k]])) {
-         Bond.p[i][k] = 1;
-       }
-       else Bond.p[i][k] = 0;
+  for (i = 0; i < NK.n; i++)
+    for (k = 0; k < NK.c[i]; k++)
+      if ((th < Corr.p[i][k]) && (thOldBlock[i] == thOldBlock[NK.p[i][k]])) {
+        Bond.p[i][k] = 1;
+      } else
+        Bond.p[i][k] = 0;
 
-   for(i=0; i< NK.n; i++){
-      max = 0;
-      for(k = 0; k<NK.c[i];  k++) 
-	 if( max < Corr.p[i][k] ){
-	    max = Corr.p[i][k];
-	    kmax = k;
-	 }
-      if(max > dh){
-         if ( dgOldBlock[i] == dgOldBlock[ NK.p[i][kmax] ] ) {
-	   Bond.p[i][kmax] = 1;
-	   Bond.p[ NK.p[i][kmax] ][ KN.p[i][kmax] ] = 1;
-	 }
+  for (i = 0; i < NK.n; i++) {
+    max = 0;
+    for (k = 0; k < NK.c[i]; k++)
+      if (max < Corr.p[i][k]) {
+        max = Corr.p[i][k];
+        kmax = k;
       }
-   }
+    if (max > dh) {
+      if (dgOldBlock[i] == dgOldBlock[NK.p[i][kmax]]) {
+        Bond.p[i][kmax] = 1;
+        Bond.p[NK.p[i][kmax]][KN.p[i][kmax]] = 1;
+      }
+    }
+  }
 
-   nc = Coarsening(Bond,Block,NK,ClusterSize,ws);
-   OrderingClusters(NK.n,nc,Block,ClusterSize,ws);
-   
-   return(nc);
-}    
+  nc = Coarsening(Bond, Block, NK, ClusterSize, ws);
+  OrderingClusters(NK.n, nc, Block, ClusterSize, ws);
 
-
-
-
-
-
-
-
+  return (nc);
+}
