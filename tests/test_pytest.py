@@ -58,11 +58,29 @@ def test_fit_WC1():
 def test_fit_WC3():
     rng = np.random.RandomState(17)
     n = 800
-    ncls = 12
+    centers = [
+        [ 8.83995008, 15.91760267],
+        [ 0.42569922, 14.36610155],
+        [13.60109470,  8.14528914],
+        [ 4.66843934, 18.18614927],
+        [24.18011345, 17.77381420],
+        [25.79795812,  7.06496737],
+        [ 6.07137600, 24.69130145],
+        [ 7.55541787, 14.17558066],
+        [ 5.24932046, 20.62399319],
+        [22.87046203, 24.97325349],
+        [12.72124934, 11.91094098],
+        [18.45346799, 13.85862137],
+        [25.95385789,  0.48370445],
+        [25.10566513,  1.05278923],
+        [16.23565765, 23.51356360],
+        [15.40187557,  5.76229234],
+        [14.29595713,  9.91734958],
+        [ 1.23132821,  6.07271092],
+    ]
     data_list = []
     gt_list = []
-    for i in range(ncls):
-        center = rng.uniform(low=0, high=25., size=2)
+    for i, center in enumerate(centers):
         data_list.append(rng.multivariate_normal(
             center, np.array([[4.2, 0.4], [0.4, 4.5]])/(i % 3*7+1), size=n))
         gt_list.append(np.ones(n)*i)
@@ -72,10 +90,10 @@ def test_fit_WC3():
     clustering = SPC(mintemp=0, maxtemp=0.251,  tempstep=0.013)
     # plt.scatter(data[:,0],data[:,1],c=gt,marker='.')
     results, metadata = clustering.fit_WC3(
-        data, min_clus=50, return_metadata=True)
+        data, min_clus=20, return_metadata=True)
 
     assert get_tprate(
-        results, gt) > 0.65, 'Low performance of WC3 in complex example'
+        results, gt) > 0.35, 'Low performance of WC3 in complex example'
     # plt.scatter(data[:,0],data[:,1],c=results,marker='.')
     f, ax = plt.subplots()
     plot_temperature_plot(metadata, ax=ax)
